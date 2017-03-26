@@ -15,6 +15,17 @@
 		FF0FE1861E8827AF0011B8D7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF0FE1841E8827AF0011B8D7 /* LaunchScreen.storyboard */; };
 		FF0FE1911E8827AF0011B8D7 /* COMP2601A4Client_100999500Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1901E8827AF0011B8D7 /* COMP2601A4Client_100999500Tests.swift */; };
 		FF0FE19C1E8827AF0011B8D7 /* COMP2601A4Client_100999500UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE19B1E8827AF0011B8D7 /* COMP2601A4Client_100999500UITests.swift */; };
+		FF0FE1AC1E882A220011B8D7 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1AB1E882A220011B8D7 /* GCDAsyncSocket.m */; };
+		FF0FE1B21E882EBB0011B8D7 /* ServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1B11E882EBB0011B8D7 /* ServiceManager.swift */; };
+		FF0FE1B41E882EEB0011B8D7 /* AcceptorReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1B31E882EEB0011B8D7 /* AcceptorReactor.swift */; };
+		FF0FE1B61E882EF20011B8D7 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1B51E882EF20011B8D7 /* Event.swift */; };
+		FF0FE1B81E882EF80011B8D7 /* EventStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1B71E882EF80011B8D7 /* EventStream.swift */; };
+		FF0FE1BA1E882EFD0011B8D7 /* JSONEventStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1B91E882EFD0011B8D7 /* JSONEventStream.swift */; };
+		FF0FE1BC1E882F030011B8D7 /* Reactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1BB1E882F030011B8D7 /* Reactor.swift */; };
+		FF0FE1BE1E882F080011B8D7 /* ReactorImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1BD1E882F080011B8D7 /* ReactorImpl.swift */; };
+		FF0FE1C01E882F0F0011B8D7 /* Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1BF1E882F0F0011B8D7 /* Handlers.swift */; };
+		FF0FE1C21E882F170011B8D7 /* EventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1C11E882F170011B8D7 /* EventHandler.swift */; };
+		FF0FE1C41E8833460011B8D7 /* Talk.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1C31E8833460011B8D7 /* Talk.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +60,19 @@
 		FF0FE1971E8827AF0011B8D7 /* COMP2601A4Client-100999500UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "COMP2601A4Client-100999500UITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF0FE19B1E8827AF0011B8D7 /* COMP2601A4Client_100999500UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COMP2601A4Client_100999500UITests.swift; sourceTree = "<group>"; };
 		FF0FE19D1E8827AF0011B8D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF0FE1A91E882A210011B8D7 /* COMP2601A4Client-100999500-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "COMP2601A4Client-100999500-Bridging-Header.h"; sourceTree = "<group>"; };
+		FF0FE1AA1E882A220011B8D7 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		FF0FE1AB1E882A220011B8D7 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		FF0FE1B11E882EBB0011B8D7 /* ServiceManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceManager.swift; sourceTree = "<group>"; };
+		FF0FE1B31E882EEB0011B8D7 /* AcceptorReactor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AcceptorReactor.swift; sourceTree = "<group>"; };
+		FF0FE1B51E882EF20011B8D7 /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		FF0FE1B71E882EF80011B8D7 /* EventStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventStream.swift; sourceTree = "<group>"; };
+		FF0FE1B91E882EFD0011B8D7 /* JSONEventStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONEventStream.swift; sourceTree = "<group>"; };
+		FF0FE1BB1E882F030011B8D7 /* Reactor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reactor.swift; sourceTree = "<group>"; };
+		FF0FE1BD1E882F080011B8D7 /* ReactorImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReactorImpl.swift; sourceTree = "<group>"; };
+		FF0FE1BF1E882F0F0011B8D7 /* Handlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Handlers.swift; sourceTree = "<group>"; };
+		FF0FE1C11E882F170011B8D7 /* EventHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventHandler.swift; sourceTree = "<group>"; };
+		FF0FE1C31E8833460011B8D7 /* Talk.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Talk.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,13 +123,26 @@
 		FF0FE1781E8827AF0011B8D7 /* COMP2601A4Client-100999500 */ = {
 			isa = PBXGroup;
 			children = (
+				FF0FE1AA1E882A220011B8D7 /* GCDAsyncSocket.h */,
+				FF0FE1AB1E882A220011B8D7 /* GCDAsyncSocket.m */,
 				FF0FE1791E8827AF0011B8D7 /* AppDelegate.swift */,
 				FF0FE17B1E8827AF0011B8D7 /* MasterViewController.swift */,
+				FF0FE1B11E882EBB0011B8D7 /* ServiceManager.swift */,
+				FF0FE1C31E8833460011B8D7 /* Talk.swift */,
+				FF0FE1B51E882EF20011B8D7 /* Event.swift */,
+				FF0FE1B71E882EF80011B8D7 /* EventStream.swift */,
+				FF0FE1B91E882EFD0011B8D7 /* JSONEventStream.swift */,
+				FF0FE1BB1E882F030011B8D7 /* Reactor.swift */,
+				FF0FE1BD1E882F080011B8D7 /* ReactorImpl.swift */,
+				FF0FE1BF1E882F0F0011B8D7 /* Handlers.swift */,
+				FF0FE1C11E882F170011B8D7 /* EventHandler.swift */,
+				FF0FE1B31E882EEB0011B8D7 /* AcceptorReactor.swift */,
 				FF0FE17D1E8827AF0011B8D7 /* DetailViewController.swift */,
 				FF0FE17F1E8827AF0011B8D7 /* Main.storyboard */,
 				FF0FE1821E8827AF0011B8D7 /* Assets.xcassets */,
 				FF0FE1841E8827AF0011B8D7 /* LaunchScreen.storyboard */,
 				FF0FE1871E8827AF0011B8D7 /* Info.plist */,
+				FF0FE1A91E882A210011B8D7 /* COMP2601A4Client-100999500-Bridging-Header.h */,
 			);
 			path = "COMP2601A4Client-100999500";
 			sourceTree = "<group>";
@@ -197,6 +234,7 @@
 					FF0FE1751E8827AF0011B8D7 = {
 						CreatedOnToolsVersion = 8.3;
 						DevelopmentTeam = 2Z33772VE8;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
 					FF0FE18B1E8827AF0011B8D7 = {
@@ -265,9 +303,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF0FE1AC1E882A220011B8D7 /* GCDAsyncSocket.m in Sources */,
+				FF0FE1BE1E882F080011B8D7 /* ReactorImpl.swift in Sources */,
+				FF0FE1C01E882F0F0011B8D7 /* Handlers.swift in Sources */,
 				FF0FE17E1E8827AF0011B8D7 /* DetailViewController.swift in Sources */,
+				FF0FE1B81E882EF80011B8D7 /* EventStream.swift in Sources */,
+				FF0FE1C21E882F170011B8D7 /* EventHandler.swift in Sources */,
 				FF0FE17C1E8827AF0011B8D7 /* MasterViewController.swift in Sources */,
+				FF0FE1C41E8833460011B8D7 /* Talk.swift in Sources */,
+				FF0FE1BC1E882F030011B8D7 /* Reactor.swift in Sources */,
+				FF0FE1BA1E882EFD0011B8D7 /* JSONEventStream.swift in Sources */,
+				FF0FE1B41E882EEB0011B8D7 /* AcceptorReactor.swift in Sources */,
 				FF0FE17A1E8827AF0011B8D7 /* AppDelegate.swift in Sources */,
+				FF0FE1B61E882EF20011B8D7 /* Event.swift in Sources */,
+				FF0FE1B21E882EBB0011B8D7 /* ServiceManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,11 +470,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 2Z33772VE8;
 				INFOPLIST_FILE = "COMP2601A4Client-100999500/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.averyvine.COMP2601A4Client-100999500";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "COMP2601A4Client-100999500/COMP2601A4Client-100999500-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -434,11 +486,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 2Z33772VE8;
 				INFOPLIST_FILE = "COMP2601A4Client-100999500/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.averyvine.COMP2601A4Client-100999500";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "COMP2601A4Client-100999500/COMP2601A4Client-100999500-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
