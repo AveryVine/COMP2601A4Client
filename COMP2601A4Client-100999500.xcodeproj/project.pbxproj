@@ -16,7 +16,6 @@
 		FF0FE1911E8827AF0011B8D7 /* COMP2601A4Client_100999500Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1901E8827AF0011B8D7 /* COMP2601A4Client_100999500Tests.swift */; };
 		FF0FE19C1E8827AF0011B8D7 /* COMP2601A4Client_100999500UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE19B1E8827AF0011B8D7 /* COMP2601A4Client_100999500UITests.swift */; };
 		FF0FE1AC1E882A220011B8D7 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1AB1E882A220011B8D7 /* GCDAsyncSocket.m */; };
-		FF0FE1B21E882EBB0011B8D7 /* ServiceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1B11E882EBB0011B8D7 /* ServiceManager.swift */; };
 		FF0FE1B41E882EEB0011B8D7 /* AcceptorReactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1B31E882EEB0011B8D7 /* AcceptorReactor.swift */; };
 		FF0FE1B61E882EF20011B8D7 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1B51E882EF20011B8D7 /* Event.swift */; };
 		FF0FE1B81E882EF80011B8D7 /* EventStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1B71E882EF80011B8D7 /* EventStream.swift */; };
@@ -25,7 +24,6 @@
 		FF0FE1BE1E882F080011B8D7 /* ReactorImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1BD1E882F080011B8D7 /* ReactorImpl.swift */; };
 		FF0FE1C01E882F0F0011B8D7 /* Handlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1BF1E882F0F0011B8D7 /* Handlers.swift */; };
 		FF0FE1C21E882F170011B8D7 /* EventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1C11E882F170011B8D7 /* EventHandler.swift */; };
-		FF0FE1C41E8833460011B8D7 /* Talk.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1C31E8833460011B8D7 /* Talk.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,7 +61,6 @@
 		FF0FE1A91E882A210011B8D7 /* COMP2601A4Client-100999500-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "COMP2601A4Client-100999500-Bridging-Header.h"; sourceTree = "<group>"; };
 		FF0FE1AA1E882A220011B8D7 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		FF0FE1AB1E882A220011B8D7 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
-		FF0FE1B11E882EBB0011B8D7 /* ServiceManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceManager.swift; sourceTree = "<group>"; };
 		FF0FE1B31E882EEB0011B8D7 /* AcceptorReactor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AcceptorReactor.swift; sourceTree = "<group>"; };
 		FF0FE1B51E882EF20011B8D7 /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		FF0FE1B71E882EF80011B8D7 /* EventStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventStream.swift; sourceTree = "<group>"; };
@@ -72,7 +69,6 @@
 		FF0FE1BD1E882F080011B8D7 /* ReactorImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReactorImpl.swift; sourceTree = "<group>"; };
 		FF0FE1BF1E882F0F0011B8D7 /* Handlers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Handlers.swift; sourceTree = "<group>"; };
 		FF0FE1C11E882F170011B8D7 /* EventHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventHandler.swift; sourceTree = "<group>"; };
-		FF0FE1C31E8833460011B8D7 /* Talk.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Talk.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,8 +123,6 @@
 				FF0FE1AB1E882A220011B8D7 /* GCDAsyncSocket.m */,
 				FF0FE1791E8827AF0011B8D7 /* AppDelegate.swift */,
 				FF0FE17B1E8827AF0011B8D7 /* MasterViewController.swift */,
-				FF0FE1B11E882EBB0011B8D7 /* ServiceManager.swift */,
-				FF0FE1C31E8833460011B8D7 /* Talk.swift */,
 				FF0FE1B51E882EF20011B8D7 /* Event.swift */,
 				FF0FE1B71E882EF80011B8D7 /* EventStream.swift */,
 				FF0FE1B91E882EFD0011B8D7 /* JSONEventStream.swift */,
@@ -310,13 +304,11 @@
 				FF0FE1B81E882EF80011B8D7 /* EventStream.swift in Sources */,
 				FF0FE1C21E882F170011B8D7 /* EventHandler.swift in Sources */,
 				FF0FE17C1E8827AF0011B8D7 /* MasterViewController.swift in Sources */,
-				FF0FE1C41E8833460011B8D7 /* Talk.swift in Sources */,
 				FF0FE1BC1E882F030011B8D7 /* Reactor.swift in Sources */,
 				FF0FE1BA1E882EFD0011B8D7 /* JSONEventStream.swift in Sources */,
 				FF0FE1B41E882EEB0011B8D7 /* AcceptorReactor.swift in Sources */,
 				FF0FE17A1E8827AF0011B8D7 /* AppDelegate.swift in Sources */,
 				FF0FE1B61E882EF20011B8D7 /* Event.swift in Sources */,
-				FF0FE1B21E882EBB0011B8D7 /* ServiceManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

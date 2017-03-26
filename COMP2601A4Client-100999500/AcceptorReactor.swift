@@ -6,26 +6,39 @@
 //  Copyright © 2017 Avery Vine. All rights reserved.
 //
 
-class AcceptorReactor: NSObject, SocketDelegate, Reactor, TalkDelegate {
+class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceBrowserDelegate, Reactor {
     
     var acceptor: Socket!
     var clients: [Socket:EventStream]
     var reactor = ReactorImpl()
     let dg = DispatchGroup()
+    var netService: NetService
     
-    override init() {
+    init(domain: String, type: String, name: String, port: Int32) {
+        print("init")
+        netService = NetService(domain: domain, type: type, name: name, port: port)
         clients = [:]
         super.init()
         acceptor = Socket(delegate: self, delegateQueue: DispatchQueue.global())
+    }
+    
+    deinit {
+        netService.stop()
+        netService.remove(from: .main, forMode: .defaultRunLoopMode)
     }
     
     /*
      * Setup the server socket: non-blocking
      */
     func accept(on port: UInt16) {
+        print("accept")
         do {
             dg.enter()
             try acceptor.accept(onPort: port)
+            netService.delegate = self
+            netService.publish()
+            netService.schedule(in: .main, forMode: .defaultRunLoopMode)
+            RunLoop.main.run()
         } catch let e {
             print(e)
         }

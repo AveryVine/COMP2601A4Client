@@ -12,7 +12,7 @@ import MultipeerConnectivity
 class MasterViewController: UITableViewController {
     
     static var instance: MasterViewController?
-    let service = ServiceManager(peerID: MCPeerID(displayName: UIDevice.current.name), type: "_tictactoe._tcp.")
+    let service = AcceptorReactor(domain: "local.", type: "_tictactoe._tcp.", name: UIDevice.current.name, port: 8889)
 
     var detailViewController: DetailViewController? = nil
     var objects = [Any]()
@@ -20,9 +20,6 @@ class MasterViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        MasterViewController.instance = self
-        
         // Do any additional setup after loading the view, typically from a nib.
         navigationItem.leftBarButtonItem = editButtonItem
 
@@ -32,11 +29,22 @@ class MasterViewController: UITableViewController {
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
+        
+        MasterViewController.instance = self
+        service.register(name: "PLAY_GAME_REQUEST", handler: PlayGameRequestHandler())
+        service.register(name: "PLAY_GAME_RESPONSE", handler: PlayGameResponseHandler())
+        service.register(name: "GAME_ON", handler: GameOnHandler())
+        service.register(name: "MOVE_MESSAGE", handler: MoveMessageHandler())
+        service.register(name: "GAME_OVER", handler: GameOverHandler())
     }
 
     override func viewWillAppear(_ animated: Bool) {
         clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
         super.viewWillAppear(animated)
+        
+        DispatchQueue(label: "serviceQueue", qos: .background, attributes: .concurrent).async {
+            self.service.accept(on: 8889)
+        }
     }
 
     override func didReceiveMemoryWarning() {

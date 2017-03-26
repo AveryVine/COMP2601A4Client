@@ -7,3 +7,33 @@
 //
 
 import Foundation
+
+class PlayGameRequestHandler: EventHandler {
+    func handleEvent(event: Event) {
+        print("PlayGameRequestHandler")
+    }
+}
+
+class PlayGameResponseHandler: EventHandler {
+    func handleEvent(event: Event) {
+        print("PlayGameResponseHandler")
+    }
+}
+
+class GameOnHandler: EventHandler {
+    func handleEvent(event: Event) {
+        print("GameOnHandler")
+    }
+}
+
+class MoveMessageHandler: EventHandler {
+    func handleEvent(event: Event) {
+        print("MoveMessageHandler")
+    }
+}
+
+class GameOverHandler: EventHandler {
+    func handleEvent(event: Event) {
+        print("GameOverHandler")
+    }
+}
