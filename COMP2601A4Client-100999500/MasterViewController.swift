@@ -7,10 +7,12 @@
 //
 
 import UIKit
+import MultipeerConnectivity
 
 class MasterViewController: UITableViewController {
     
     static var instance: MasterViewController?
+    let service = ServiceManager(peerID: MCPeerID(displayName: UIDevice.current.name), type: "_tictactoe._tcp.")
 
     var detailViewController: DetailViewController? = nil
     var objects = [Any]()
@@ -30,8 +32,6 @@ class MasterViewController: UITableViewController {
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
-        
-        let service = BonjourService(domain: "local.", type: "_tictactoe._tcp.")
     }
 
     override func viewWillAppear(_ animated: Bool) {

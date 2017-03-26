@@ -6,7 +6,7 @@
 //  Copyright © 2017 Avery Vine. All rights reserved.
 //
 
-class AcceptorReactor: NSObject, SocketDelegate, Reactor {
+class AcceptorReactor: NSObject, SocketDelegate, Reactor, TalkDelegate {
     
     var acceptor: Socket!
     var clients: [Socket:EventStream]
