@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		70EC98741E885B6A00383346 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70EC98731E885B6A00383346 /* Game.swift */; };
+		70EC98761E885BA600383346 /* Observer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70EC98751E885BA600383346 /* Observer.swift */; };
+		70EC98781E885C0000383346 /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70EC98771E885C0000383346 /* Strings.swift */; };
 		FF0FE17A1E8827AF0011B8D7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE1791E8827AF0011B8D7 /* AppDelegate.swift */; };
 		FF0FE17C1E8827AF0011B8D7 /* MasterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE17B1E8827AF0011B8D7 /* MasterViewController.swift */; };
 		FF0FE17E1E8827AF0011B8D7 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0FE17D1E8827AF0011B8D7 /* DetailViewController.swift */; };
@@ -44,6 +47,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		70EC98731E885B6A00383346 /* Game.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		70EC98751E885BA600383346 /* Observer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Observer.swift; sourceTree = "<group>"; };
+		70EC98771E885C0000383346 /* Strings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
 		FF0FE1761E8827AF0011B8D7 /* COMP2601A4Client-100999500.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "COMP2601A4Client-100999500.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF0FE1791E8827AF0011B8D7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FF0FE17B1E8827AF0011B8D7 /* MasterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterViewController.swift; sourceTree = "<group>"; };
@@ -137,6 +143,9 @@
 				FF0FE1841E8827AF0011B8D7 /* LaunchScreen.storyboard */,
 				FF0FE1871E8827AF0011B8D7 /* Info.plist */,
 				FF0FE1A91E882A210011B8D7 /* COMP2601A4Client-100999500-Bridging-Header.h */,
+				70EC98731E885B6A00383346 /* Game.swift */,
+				70EC98751E885BA600383346 /* Observer.swift */,
+				70EC98771E885C0000383346 /* Strings.swift */,
 			);
 			path = "COMP2601A4Client-100999500";
 			sourceTree = "<group>";
@@ -298,6 +307,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF0FE1AC1E882A220011B8D7 /* GCDAsyncSocket.m in Sources */,
+				70EC98761E885BA600383346 /* Observer.swift in Sources */,
+				70EC98741E885B6A00383346 /* Game.swift in Sources */,
 				FF0FE1BE1E882F080011B8D7 /* ReactorImpl.swift in Sources */,
 				FF0FE1C01E882F0F0011B8D7 /* Handlers.swift in Sources */,
 				FF0FE17E1E8827AF0011B8D7 /* DetailViewController.swift in Sources */,
@@ -306,6 +317,7 @@
 				FF0FE17C1E8827AF0011B8D7 /* MasterViewController.swift in Sources */,
 				FF0FE1BC1E882F030011B8D7 /* Reactor.swift in Sources */,
 				FF0FE1BA1E882EFD0011B8D7 /* JSONEventStream.swift in Sources */,
+				70EC98781E885C0000383346 /* Strings.swift in Sources */,
 				FF0FE1B41E882EEB0011B8D7 /* AcceptorReactor.swift in Sources */,
 				FF0FE17A1E8827AF0011B8D7 /* AppDelegate.swift in Sources */,
 				FF0FE1B61E882EF20011B8D7 /* Event.swift in Sources */,
@@ -566,6 +578,7 @@
 				FF0FE1A21E8827AF0011B8D7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FF0FE1A31E8827AF0011B8D7 /* Build configuration list for PBXNativeTarget "COMP2601A4Client-100999500Tests" */ = {
 			isa = XCConfigurationList;
@@ -574,6 +587,7 @@
 				FF0FE1A51E8827AF0011B8D7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FF0FE1A61E8827AF0011B8D7 /* Build configuration list for PBXNativeTarget "COMP2601A4Client-100999500UITests" */ = {
 			isa = XCConfigurationList;
@@ -582,6 +596,7 @@
 				FF0FE1A81E8827AF0011B8D7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
