@@ -11,6 +11,7 @@ import Foundation
 class PlayGameRequestHandler: EventHandler {
     func handleEvent(event: Event) {
         print("PlayGameRequestHandler")
+        MasterViewController.instance?.playGameRequest(event: event)
     }
 }
 

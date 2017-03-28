@@ -24,6 +24,9 @@ class DetailViewController: UIViewController {
     @IBOutlet var button: UIButton?
     @IBOutlet var switchAI: UISwitch?
     
+    static var instance: DetailViewController?
+    var opponentName: String!
+    var acceptor: AcceptorReactor?
     var gameThread: DispatchQueue?
     var timer: DispatchSourceTimer?
     var game = Game()
@@ -46,6 +49,7 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        DetailViewController.instance = self
         configureView()
         
         initUI()
@@ -58,11 +62,16 @@ class DetailViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    var detailItem: NSDate? {
+    var detailItem: NetService? {
         didSet {
             // Update the view.
             configureView()
         }
+    }
+    
+    func openConnection(acceptor: AcceptorReactor, hostName: String, port: UInt16) {
+        self.acceptor = acceptor
+        acceptor.open(host: hostName, port: port)
     }
     
     
@@ -332,6 +341,31 @@ class DetailViewController: UIViewController {
             game.toggleActive()
         }
         toggleClickListeners()
+    }
+    
+    func playGameRequest(event: Event) {
+        opponentName = event.fields["SOURCE"]! as! String
+        let refreshAlert = UIAlertController(title: "Tic Tac Toe", message: "\(opponentName) has challenged you to a game.", preferredStyle: UIAlertControllerStyle.alert)
+        
+        refreshAlert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { (action: UIAlertAction!) in
+            print("Sending Accept")
+            Event(stream: event.stream,
+                  fields: ["TYPE": "PLAY_GAME_RESPONSE",
+                           "SOURCE": (MasterViewController.instance?.deviceName)!,
+                           "DESTINATION": self.opponentName,
+                           "ANSWER": true]).put()
+        }))
+        
+        refreshAlert.addAction(UIAlertAction(title: "Decline", style: .cancel, handler: { (action: UIAlertAction!) in
+            print("Sending Decline")
+            Event(stream: event.stream,
+                  fields: ["TYPE": "PLAY_GAME_RESPONSE",
+                           "SOURCE": (MasterViewController.instance?.deviceName)!,
+                           "DESTINATION": self.opponentName,
+                           "ANSWER": false]).put()
+        }))
+        
+        present(refreshAlert, animated: true, completion: nil)
     }
 }
 
