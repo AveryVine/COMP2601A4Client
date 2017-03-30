@@ -2,8 +2,8 @@
 //  DetailViewController.swift
 //  COMP2601A4Client-100999500
 //
-//  Created by Avery Vine on 2017-03-26.
-//  Copyright © 2017 Avery Vine. All rights reserved.
+//  Created by Avery Vine (100999500) and Alexei Tipenko (100995947) on 2017-03-26.
+//  Copyright © 2017 Avery Vine and Alexei Tipenko. All rights reserved.
 //
 
 import UIKit
@@ -26,9 +26,8 @@ class DetailViewController: UIViewController, Observer {
     static var instance: DetailViewController?
     var stream: EventStream?
     var acceptor: AcceptorReactor?
-    var gameThread: DispatchQueue?
-    var timer: DispatchSourceTimer?
     var game = Game()
+    var playerTurn: Int!
     var xImage = UIImage(named: "x_button")
     var oImage = UIImage(named: "o_button")
     var emptyImage = UIImage(named: "empty_button")
@@ -37,7 +36,6 @@ class DetailViewController: UIViewController, Observer {
 
 
     func configureView() {
-        // Update the user interface for the detail item.
         if let detail = detailItem {
             if let label = detailDescriptionLabel {
                 label.text = detail.description
@@ -45,24 +43,30 @@ class DetailViewController: UIViewController, Observer {
         }
     }
 
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Override the provided back button in order to provide a function that can disconnect sockets
         navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
         navigationItem.leftItemsSupplementBackButton = false
         navigationItem.hidesBackButton = true
         let newBackButton = UIBarButtonItem(title: "Close Game", style: UIBarButtonItemStyle.plain, target: self, action: #selector(DetailViewController.back(sender:)))
         navigationItem.setLeftBarButton(newBackButton, animated: true)
         
-        // Do any additional setup after loading the view, typically from a nib.
         DetailViewController.instance = self
         configureView()
         
         acceptor = MasterViewController.instance?.acceptor
+        
+        // Check whether the current player is the one initiating or receiving a connection
         if detailItem != nil {
+            playerTurn = Game.X_VAL
             openConnection(host: (detailItem?.hostName)!, port: UInt16((detailItem?.port)!))
         }
         else {
+            playerTurn = Game.O_VAL
             stream = MasterViewController.instance?.stream
         }
         
@@ -70,24 +74,31 @@ class DetailViewController: UIViewController, Observer {
         game.toggleActive()
         toggleClickListeners()
     }
+    
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
+    
+    
 
     var detailItem: NetService? {
         didSet {
-            // Update the view.
             configureView()
         }
     }
     
+    
+    
+    // Set the AcceptorReactor to the one provided by the Master View Controller
     func setAcceptor(acceptor: AcceptorReactor) {
         self.acceptor = acceptor
-        print("Acceptor set")
     }
     
+    
+    
+    // Open a connection
     func openConnection(host: String, port: UInt16) {
         MasterViewController.instance?.inGame = MasterViewController.instance?.BETWEEN_GAMES
         acceptor?.open(host: host, port: port)
@@ -115,9 +126,9 @@ class DetailViewController: UIViewController, Observer {
      - Input: the winner of the game
      - Return: none
      ----------*/
-    func updateGameWinner(winner: Int) {
+    func updateGameWinner(winner: Int, gameEnder: String) {
         DispatchQueue.main.async {
-            self.gameOverUI(winner: winner)
+            self.gameOverUI(winner: winner, gameEnder: gameEnder)
         }
     }
     
@@ -131,62 +142,23 @@ class DetailViewController: UIViewController, Observer {
     @IBAction func startButtonOnClick() {
         if game.getActive() {
             game.toggleActive()
-            gameOverUI(winner: Game.EMPTY_VAL)
-            toggleClickListeners()
+            gameOverUI(winner: Game.EMPTY_VAL, gameEnder: (MasterViewController.instance?.deviceName)!)
+            if playerTurn == game.getPlayerTurn() { toggleClickListeners() }
+            let source = (MasterViewController.instance?.deviceName)!
+            let destination = (MasterViewController.instance?.opponentName)!
+            Event(stream: stream!, fields: ["TYPE": "GAME_OVER", "SOURCE": source, "DESTINATION": destination, "REASON": strings.no_winner]).put()
         }
-        else {
+        else if playerTurn == Game.X_VAL {
             game = Game()
-            self.game.attachObserver(observer: self as Observer)
+            self.game.attachObserver(observer: self)
             prepareUI()
             toggleClickListeners()
-            gameLoop()
+            let source = (MasterViewController.instance?.deviceName)!
+            let destination = (MasterViewController.instance?.opponentName)!
+            Event(stream: stream!, fields: ["TYPE": "GAME_ON", "SOURCE": source, "DESTINATION": destination]).put()
         }
     }
-    /*
     
-    
-    /*----------
-     - Description: creates and starts the game loop for the computer
-     - Input: none
-     - Return: none
-     ----------*/
-    func gameLoop() {
-        gameThread = DispatchQueue(label: "gameThread", attributes: .concurrent)
-        timer?.cancel()
-        let computerMoveTask = DispatchWorkItem() {
-            if !self.game.getActive() {
-                self.timer?.cancel()
-                self.timer = nil
-            }
-            let choice = self.game.randomSquare(switchAI: true)
-            DispatchQueue.main.sync {
-                self.game.makeMove(choice: choice)
-            }
-            let gameWinner = self.game.gameWinner()//(currBoard: self.game.getBoard(), currPlayerTurn: self.game.getPlayerTurn())
-            if gameWinner == Game.EMPTY_VAL {
-                self.game.switchPlayer()
-                DispatchQueue.main.async {
-                    self.toggleClickListeners()
-                }
-            }
-            else {
-                self.game.toggleActive()
-                DispatchQueue.main.async {
-                    self.timer?.cancel()
-                    self.timer = nil
-                    if self.game.getPlayerTurn() == Game.X_VAL {
-                        self.toggleClickListeners()
-                    }
-                }
-            }
-        }
-        
-        timer = DispatchSource.makeTimerSource(queue: gameThread)
-        timer?.scheduleRepeating(deadline: .now() + .seconds(2), interval: .seconds(2))
-        timer?.setEventHandler(handler: computerMoveTask)
-        timer?.resume()
-    }
-    */
     
     
     /*----------
@@ -202,36 +174,38 @@ class DetailViewController: UIViewController, Observer {
         else {
             image = oImage
         }
-        switch choice {
-        case 0:
-            tile0?.setImage(image, for: UIControlState.normal)
-            break
-        case 1:
-            tile1?.setImage(image, for: UIControlState.normal)
-            break
-        case 2:
-            tile2?.setImage(image, for: UIControlState.normal)
-            break
-        case 3:
-            tile3?.setImage(image, for: UIControlState.normal)
-            break
-        case 4:
-            tile4?.setImage(image, for: UIControlState.normal)
-            break
-        case 5:
-            tile5?.setImage(image, for: UIControlState.normal)
-            break
-        case 6:
-            tile6?.setImage(image, for: UIControlState.normal)
-            break
-        case 7:
-            tile7?.setImage(image, for: UIControlState.normal)
-            break
-        case 8:
-            tile8?.setImage(image, for: UIControlState.normal)
-            break
-        default:
-            print("Error setting button image")
+        DispatchQueue.main.async {
+            switch choice {
+            case 0:
+                self.tile0?.setImage(image, for: UIControlState.normal)
+                break
+            case 1:
+                self.tile1?.setImage(image, for: UIControlState.normal)
+                break
+            case 2:
+                self.tile2?.setImage(image, for: UIControlState.normal)
+                break
+            case 3:
+                self.tile3?.setImage(image, for: UIControlState.normal)
+                break
+            case 4:
+                self.tile4?.setImage(image, for: UIControlState.normal)
+                break
+            case 5:
+                self.tile5?.setImage(image, for: UIControlState.normal)
+                break
+            case 6:
+                self.tile6?.setImage(image, for: UIControlState.normal)
+                break
+            case 7:
+                self.tile7?.setImage(image, for: UIControlState.normal)
+                break
+            case 8:
+                self.tile8?.setImage(image, for: UIControlState.normal)
+                break
+            default:
+                print("Error setting button image")
+            }
         }
     }
     
@@ -243,15 +217,36 @@ class DetailViewController: UIViewController, Observer {
      - Return: none
      ----------*/
     func updateDisplayTextView(choice: Int) {
-        if choice == 0 { label?.text = strings.square0 }
-        else if choice == 1 { label?.text = strings.square1 }
-        else if choice == 2 { label?.text = strings.square2 }
-        else if choice == 3 { label?.text = strings.square3 }
-        else if choice == 4 { label?.text = strings.square4 }
-        else if choice == 5 { label?.text = strings.square5 }
-        else if choice == 6 { label?.text = strings.square6 }
-        else if choice == 7 { label?.text = strings.square7 }
-        else if choice == 8 { label?.text = strings.square8 }
+        print("\(game.getPlayerTurn()), \(playerTurn)")
+        if game.getPlayerTurn() == playerTurn {
+            DispatchQueue.main.async {
+                if choice == 0 { self.label?.text = self.strings.square0 + self.strings.you }
+                else if choice == 1 { self.label?.text = self.strings.square1 + self.strings.you }
+                else if choice == 2 { self.label?.text = self.strings.square2 + self.strings.you }
+                else if choice == 3 { self.label?.text = self.strings.square3 + self.strings.you }
+                else if choice == 4 { self.label?.text = self.strings.square4 + self.strings.you }
+                else if choice == 5 { self.label?.text = self.strings.square5 + self.strings.you }
+                else if choice == 6 { self.label?.text = self.strings.square6 + self.strings.you }
+                else if choice == 7 { self.label?.text = self.strings.square7 + self.strings.you }
+                else if choice == 8 { self.label?.text = self.strings.square8 + self.strings.you }
+                else { self.label?.text = self.strings.blank }
+            }
+        }
+        else {
+            DispatchQueue.main.async {
+                let opponentName = (MasterViewController.instance?.opponentName)!
+                if choice == 0 { self.label?.text = self.strings.square0 + opponentName}
+                else if choice == 1 { self.label?.text = self.strings.square1 + opponentName }
+                else if choice == 2 { self.label?.text = self.strings.square2 + opponentName}
+                else if choice == 3 { self.label?.text = self.strings.square3 + opponentName}
+                else if choice == 4 { self.label?.text = self.strings.square4 + opponentName}
+                else if choice == 5 { self.label?.text = self.strings.square5 + opponentName}
+                else if choice == 6 { self.label?.text = self.strings.square6 + opponentName}
+                else if choice == 7 { self.label?.text = self.strings.square7 + opponentName}
+                else if choice == 8 { self.label?.text = self.strings.square8 + opponentName}
+                else { self.label?.text = self.strings.blank }
+            }
+        }
     }
     
     
@@ -262,8 +257,15 @@ class DetailViewController: UIViewController, Observer {
      - Return: none
      ----------*/
     func initUI() {
-        button?.setTitle(strings.startButton_gameInactive, for: UIControlState.normal)
-        label?.text = strings.displayTextView_gameInactive
+        if playerTurn == Game.X_VAL {
+            button?.setTitle(strings.startButton_gameInactive, for: UIControlState.normal)
+            label?.text = strings.displayTextView_gameInactive
+        }
+        else {
+            label?.text = strings.waitingForOpponent
+            button?.setTitle(strings.startButton_gameWaiting, for: UIControlState.normal)
+            button?.isEnabled = false
+        }
         wipeSquares()
     }
     
@@ -288,38 +290,53 @@ class DetailViewController: UIViewController, Observer {
      - Return: none
      ----------*/
     func wipeSquares() {
-        tile0?.setImage(emptyImage, for: UIControlState.normal)
-        tile1?.setImage(emptyImage, for: UIControlState.normal)
-        tile2?.setImage(emptyImage, for: UIControlState.normal)
-        tile3?.setImage(emptyImage, for: UIControlState.normal)
-        tile4?.setImage(emptyImage, for: UIControlState.normal)
-        tile5?.setImage(emptyImage, for: UIControlState.normal)
-        tile6?.setImage(emptyImage, for: UIControlState.normal)
-        tile7?.setImage(emptyImage, for: UIControlState.normal)
-        tile8?.setImage(emptyImage, for: UIControlState.normal)
+        DispatchQueue.main.async {
+            self.tile0?.setImage(self.emptyImage, for: UIControlState.normal)
+            self.tile1?.setImage(self.emptyImage, for: UIControlState.normal)
+            self.tile2?.setImage(self.emptyImage, for: UIControlState.normal)
+            self.tile3?.setImage(self.emptyImage, for: UIControlState.normal)
+            self.tile4?.setImage(self.emptyImage, for: UIControlState.normal)
+            self.tile5?.setImage(self.emptyImage, for: UIControlState.normal)
+            self.tile6?.setImage(self.emptyImage, for: UIControlState.normal)
+            self.tile7?.setImage(self.emptyImage, for: UIControlState.normal)
+            self.tile8?.setImage(self.emptyImage, for: UIControlState.normal)
+        }
     }
     
     
     
     /*----------
      - Description: displays the "Game Over" UI to the user
-     - Input: the winner of the game
+     - Input: the winner of the game, the player who ended the game (sometimes different)
      - Return: none
      ----------*/
-    func gameOverUI(winner: Int) {
-        if winner == Game.X_VAL {
-            label?.text = strings.x_winner
+    func gameOverUI(winner: Int, gameEnder: String) {
+        DispatchQueue.main.async {
+            if winner == Game.TIE_VAL {
+                self.label?.text = self.strings.tie_winner
+            }
+            else if winner == Game.EMPTY_VAL {
+                if gameEnder == (MasterViewController.instance?.deviceName)! {
+                    self.label?.text = self.strings.you + self.strings.no_winner
+                }
+                else {
+                    self.label?.text = (MasterViewController.instance?.opponentName)! + self.strings.no_winner
+                }
+            }
+            else if winner == self.playerTurn {
+                self.label?.text = self.strings.you + self.strings.gameOver
+            }
+            else {
+                self.label?.text = (MasterViewController.instance?.opponentName)! + self.strings.gameOver
+            }
+            if self.playerTurn == Game.X_VAL {
+                self.button?.setTitle(self.strings.startButton_gameInactive, for: UIControlState.normal)
+            }
+            else {
+                self.button?.isEnabled = false
+                self.button?.setTitle(self.strings.startButton_gameWaiting, for: UIControlState.normal)
+            }
         }
-        else if winner == Game.O_VAL {
-            label?.text = strings.o_winner
-        }
-        else if winner == Game.TIE_VAL {
-            label?.text = strings.tie_winner
-        }
-        else {
-            label?.text = strings.no_winner
-        }
-        button?.setTitle(strings.startButton_gameInactive, for: UIControlState.normal)
     }
     
     
@@ -349,21 +366,24 @@ class DetailViewController: UIViewController, Observer {
      - Return: none
      ----------*/
     @IBAction func squareClicked(sender: UIButton) {
-        timer?.cancel()
-        timer = nil
         let choice = sender.tag
-        game.makeMove(choice: choice)
-        let gameWinner = game.gameWinner()//(currBoard: game.getBoard(), currPlayerTurn: game.getPlayerTurn())
-        if gameWinner == Game.EMPTY_VAL {
+        if !game.squareOccupied(square: choice) {
+            game.makeMove(choice: choice)
+            let source = (MasterViewController.instance?.deviceName)!
+            let destination = (MasterViewController.instance?.opponentName)!
+            Event(stream: stream!, fields: ["TYPE": "MOVE_MESSAGE", "SOURCE": source, "DESTINATION": destination, "MOVE": choice]).put()
+            toggleClickListeners()
             game.switchPlayer()
-            gameLoop()
         }
-        else {
-            game.toggleActive()
-        }
-        toggleClickListeners()
     }
     
+    
+    
+    /*
+     - Description: pops the detail view controller and disconnects the stream, if applicable
+     - Input: the back button
+     - Return: none
+     */
     func back(sender: UIBarButtonItem) {
         print("Back button pressed")
         if stream != nil {
@@ -373,6 +393,13 @@ class DetailViewController: UIViewController, Observer {
         _ = navigationController?.navigationController?.popViewController(animated: true)
     }
     
+    
+    
+    /*
+     - Description: runs when the opponent disconnects from a game
+     - Input: none
+     - Return: none
+     */
     func opponentDisconnected() {
         let opponentName = (MasterViewController.instance?.opponentName)!
         let alert = UIAlertController(title: "Tic Tac Toe", message: "\(opponentName) has disconnected.", preferredStyle: UIAlertControllerStyle.alert)
@@ -382,6 +409,13 @@ class DetailViewController: UIViewController, Observer {
         MasterViewController.instance?.inGame = MasterViewController.instance?.BETWEEN_GAMES
     }
     
+    
+
+    /*
+     - Description: depending on opponent's response: pops the view controller and disconnects, or allows the game to be started
+     - Input: the source player's name, the response from the player, the event's stream connection
+     - Return: none
+     */
     func playGameResponseHandler(source: String, response: Bool, stream: EventStream) {
         print("Response: \(response)")
         if response {
@@ -399,21 +433,34 @@ class DetailViewController: UIViewController, Observer {
         }
     }
     
+    
+    
+    /*
+     - Description: starts up a new game
+     - Input: the source player's name
+     - Return: none
+     */
     func gameOnHandler(source: String) {
         prepareUI()
         DispatchQueue.main.async {
-            self.label?.text = source + " has started a game."
+            self.label?.text = source + self.strings.displayTextView_gameStart
+            self.button?.isEnabled = true
         }
         game = Game()
+        self.game.attachObserver(observer: self)
     }
     
+    
+    
+    /*
+     - Description: receives a move from the opponent
+     - Input: the move made, the source player's name, the destination player's name
+     - Return: none
+     */
     func moveMessageHandler(choice: Int, source: String, destination: String) {
-        DispatchQueue.main.sync {
-            self.game.makeMove(choice: choice)  //Observer updates UI for you
-        }
+        game.makeMove(choice: choice)
         
-        
-        let gameWinner = game.gameWinner()
+        let gameWinner = game.gameWinner(notify: true)
         if gameWinner == Game.EMPTY_VAL {
             game.switchPlayer()
             DispatchQueue.main.async {
@@ -422,23 +469,31 @@ class DetailViewController: UIViewController, Observer {
         }
         else {
             self.game.toggleActive()
-            //DispatchQueue.main.async {
-                //self.gameOverUI(winner: gameWinner)
-            //}
             Event(stream: stream!, fields: ["TYPE": "GAME_OVER", "SOURCE": destination, "DESTINATION": source, "REASON": source + " won the game."]).put()
         }
     }
     
-    func gameOverHandler(reason: String, destination: String, stream: EventStream) {
-        //TODO - deal with response here
-        /*
-        game.toggleActive();
-        int winner = Integer.parseInt(message.body.getField(Fields.WINNER).toString());
-        String gameEnder = message.header.id;
-        gameOverUI(winner, gameEnder);
- */
-        self.game.toggleActive()
-        _ = game.gameWinner()
+    
+    
+    /*
+     - Description: displays the gameOverUI, as the game has ended for some reason
+     - Input: the reason for the game ending, the event's stream connection
+     - Return: none
+     */
+    func gameOverHandler(reason: String, stream: EventStream) {
+        game.toggleActive()
+        if reason == strings.no_winner {
+            if playerTurn == game.getPlayerTurn() { toggleClickListeners() }
+            gameOverUI(winner: Game.EMPTY_VAL, gameEnder: reason)
+        }
+        else {
+            if game.gameWinner(notify: false) == Game.TIE_VAL {
+                gameOverUI(winner: Game.TIE_VAL, gameEnder: reason)
+            }
+            else {
+                gameOverUI(winner: playerTurn, gameEnder: reason)
+            }
+        }
     }
 }
 

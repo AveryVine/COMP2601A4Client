@@ -2,8 +2,8 @@
 //  AppDelegate.swift
 //  COMP2601A4Client-100999500
 //
-//  Created by Avery Vine on 2017-03-26.
-//  Copyright © 2017 Avery Vine. All rights reserved.
+//  Created by Avery Vine (100999500) and Alexei Tipenko (100995947) on 2017-03-26.
+//  Copyright © 2017 Avery Vine and Alexei Tipenko. All rights reserved.
 //
 
 import UIKit
@@ -42,6 +42,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
+        if DetailViewController.instance?.stream != nil {
+            let strings = Strings()
+            let source = (MasterViewController.instance?.deviceName)!
+            let destination = (MasterViewController.instance?.opponentName)!
+            let stream = (DetailViewController.instance?.stream)!
+            Event(stream: stream, fields: ["TYPE": "GAME_OVER", "SOURCE": source, "DESTINATION": destination, "REASON": strings.no_winner]).put()
+            stream.close()
+        }
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 

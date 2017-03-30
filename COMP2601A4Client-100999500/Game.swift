@@ -2,8 +2,8 @@
 //  Game.swift
 //  COMP2601A4Client-100999500
 //
-//  Created by Alexei Tipenko on 2017-03-26.
-//  Copyright © 2017 Avery Vine. All rights reserved.
+//  Created by Avery Vine (100999500) and Alexei Tipenko (100995947) on 2017-03-26.
+//  Copyright © 2017 Avery Vine and Alexei Tipenko. All rights reserved.
 //
 
 import Foundation
@@ -63,9 +63,9 @@ class Game {
      - Input: the winner of the game
      - Return: none
      ----------*/
-    private func notifyGameWinner(winner: Int) {
+    private func notifyGameWinner(winner: Int, gameEnder: String) {
         for observer in observerArray {
-            observer.updateGameWinner(winner: winner)
+            observer.updateGameWinner(winner: winner, gameEnder: gameEnder)
         }
     }
     
@@ -88,7 +88,8 @@ class Game {
      - Input: the board to be tested for a winner, the last player to have made a move on the board
      - Return: 1 (X wins), 2 (O wins), 3 (tie), or 0 (game not over)
      ----------*/
-    func gameWinner() -> Int {
+    func gameWinner(notify: Bool) -> Int {
+        print(playerTurn)
         if (checkForRow(square1: 0, square2: 1, square3: 2)
             || checkForRow(square1: 3, square2: 4, square3: 5)
             || checkForRow(square1: 6, square2: 7, square3: 8)
@@ -97,7 +98,7 @@ class Game {
             || checkForRow(square1: 2, square2: 5, square3: 8)
             || checkForRow(square1: 0, square2: 4, square3: 8)
             || checkForRow(square1: 2, square2: 4, square3: 6)) {
-            notifyGameWinner(winner: playerTurn)
+            if notify { notifyGameWinner(winner: playerTurn, gameEnder: (MasterViewController.instance?.opponentName)!) }
             return playerTurn;
         }
         for i in 0 ..< 9 {
@@ -105,7 +106,7 @@ class Game {
                 return Game.EMPTY_VAL;
             }
         }
-        notifyGameWinner(winner: Game.TIE_VAL)
+        if notify { notifyGameWinner(winner: Game.TIE_VAL, gameEnder: (MasterViewController.instance?.opponentName)!) }
         return Game.TIE_VAL;
     }
     

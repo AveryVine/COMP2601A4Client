@@ -2,8 +2,8 @@
 //  AcceptorReactor.swift
 //  COMP2601A4Client-100999500
 //
-//  Created by Avery Vine on 2017-03-26.
-//  Copyright © 2017 Avery Vine. All rights reserved.
+//  Created by Avery Vine (100999500) and Alexei Tipenko (100995947) on 2017-03-26.
+//  Copyright © 2017 Avery Vine and Alexei Tipenko. All rights reserved.
 //
 
 import UIKit
@@ -14,6 +14,7 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
     var clients: [Socket:EventStream]
     var reactor = ReactorImpl()
     let dg = DispatchGroup()
+    let strings = Strings()
     
     //Server variables
     var netService: NetService
@@ -22,6 +23,8 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
     var services: [NetService]
     var browser: NetServiceBrowser
     var socket: GCDAsyncSocket!
+    
+    
     
     init(domain: String, type: String, name: String, port: Int32) {
         //Client pre-initializer
@@ -44,12 +47,16 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         
     }
     
+    
+    
     deinit {
         netService.stop()
         netService.remove(from: .main, forMode: .defaultRunLoopMode)
     }
     
-    //Server setup
+    
+    
+    // Accepts incoming services on a provided port
     func accept(on port: UInt16) {
         do {
             dg.enter()
@@ -63,7 +70,9 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         }
     }
     
-    //Client setup
+    
+    
+    // Opens a socket on a provided host and port
     func open(host: String, port:UInt16) {
         socket = GCDAsyncSocket(delegate: self, delegateQueue: DispatchQueue.main)
         do {
@@ -74,23 +83,26 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         }
     }
     
+    
+    
+    /*
+     - Description: if any sockets are connected, disconnect them and alert the person on the other end
+     - Input: stream to be closed
+     - Return: none
+     */
     func disconnect(stream: EventStream) {
-        print("Disconnect")
         if MasterViewController.instance?.inGame != MasterViewController.instance?.NOT_IN_GAME {
-            print("In Game")
             let source = (MasterViewController.instance?.deviceName)!
             let destination = (MasterViewController.instance?.opponentName)!
-            Event(stream: stream, fields: ["TYPE": "GAME_OVER", "SOURCE": source, "DESTINATION": destination, "REASON": (source + " ended the game.")]).put()
+            Event(stream: stream, fields: ["TYPE": "GAME_OVER", "SOURCE": source, "DESTINATION": destination, "REASON": strings.no_winner]).put()
             stream.close()
-        }
-        else {
-            print("Not In Game")
         }
     }
     
-    //Client setup
+    
+    
+    // Runs when a new service is found
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
-        print("netServiceBrowser - didFind - \(service.name)")
         service.delegate = self
         if !services.contains(service) && service != netService {
             services.append(service)
@@ -98,18 +110,23 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         }
     }
     
+    
+    
+    // Runs when a service's address is resolved
     func netServiceDidResolveAddress(_ sender: NetService) {
-        print("netServiceDidResolveAddress - \(sender.name)")
         MasterViewController.instance?.updateServices(services: services)
-        
-        //Put the next line on a button click to open a connection
-        //connection.open(host: sender.hostName!, port: UInt16(sender.port))
     }
     
+    
+    
+    // Runs when a service's address fails to be resolved
     func netService(_ sender: NetService, didNotResolve errorDict: [String : NSNumber]) {
         print("netService - didNotResolve - \(sender.name)")
     }
     
+    
+    
+    // Runs when a service is removed
     func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
         print("netServiceBrowser - didRemove - \(service.name)")
         if let index = services.index(of: service) {
@@ -118,20 +135,27 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         MasterViewController.instance?.updateServices(services: services)
     }
     
-    //Reactor protocol
+    
+    
     func register(name: String, handler: EventHandler) {
         reactor.register(name: name, handler: handler)
     }
+    
+    
     
     func deregister(name: String) {
         reactor.deregister(name: name)
     }
     
+    
+    
     func dispatch(event: Event) {
         reactor.dispatch(event: event)
     }
     
-    //GCDAsyncSocketDelegate callbacks
+    
+    
+    // Runs when a new socket is accepted
     func socket(_ socket: Socket, didAcceptNewSocket newSocket: Socket) {
         print("Socket Created")
         let es = JSONEventStream(socket: newSocket)
@@ -139,6 +163,9 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         es.get()
     }
 
+    
+    
+    // Runs when a socket succeeds in connecting
     func socket(_ socket : GCDAsyncSocket, didConnectToHost host:String, port p:UInt16) {
         print("Socket Created")
         let es = JSONEventStream(socket: socket)
@@ -149,6 +176,9 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         es.get()
     }
     
+    
+    
+    // Runs when a socket disconnects
     func socketDidDisconnect(_ sock: Socket, withError err: Error?) {
         print("Client disconnected with error: \(String(describing: err))")
         clients.removeValue(forKey: sock)
@@ -158,6 +188,9 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         }
     }
 
+    
+    
+    // Runs when a socket reads some data
     func socket(_ sock: Socket, didRead data: Data, withTag tag: Int) {
         print("Received data")
         let es = clients[sock]
