@@ -12,11 +12,11 @@ class Game {
     
     static var X_VAL = 1, O_VAL = 2, TIE_VAL = 3, EMPTY_VAL = 0
     
-    private var board = Array(repeating: 0, count: 9)
+    private var board: Array<Int>
     private var playerTurn: Int
     private var active: Bool
     
-    private var observerArray = [Observer]()
+    private var observerArray: [Observer]
     
     
     
@@ -28,6 +28,8 @@ class Game {
     init() {
         active = true;
         playerTurn = Game.X_VAL
+        board = Array(repeating: 0, count: 9)
+        observerArray = [Observer]()
     }
     
     
@@ -70,26 +72,6 @@ class Game {
     
     
     /*----------
-     - Description: select a random unoccupied square to make a move in
-     - Input: whether computer AI is enabled or not
-     - Return: the selected square
-     ----------*/
-    func randomSquare(switchAI: Bool) -> Int {
-        var choice = -1
-        if playerTurn == Game.O_VAL && switchAI {
-            choice = bestMove(lastBoard: board, lastPlayerTurn: Game.X_VAL)
-        }
-        else {
-            repeat {
-                choice = Int(arc4random_uniform(UInt32(9)))
-            } while (board[choice] != Game.EMPTY_VAL)
-        }
-        return choice;
-    }
-    
-    
-    
-    /*----------
      - Description: makes a move for the current player at the given square
      - Input: choice of square
      - Return: none
@@ -102,83 +84,28 @@ class Game {
     
     
     /*----------
-     - Description: tries to make a good move using the minimax algorithm
-     - Input: a potential iteration of the board, the last player to have played in that iteration
-     - Return: none
-     - Notes on Computer AI:
-     - The computer AI makes use of the minimax algorithm, which recursively assigns values to each potential end game
-     - It assigns 10 points for a computer win, -10 points for a human win, and 0 points for a tie
-     - It takes that score and bumps it down the stack until it reaches the actual current state of the board
-     - It then chooses the move with the overall best total score
-     - Credit to http://neverstopbuilding.com/minimax for the algorithm and explanation
-     ----------*/
-    func bestMove(lastBoard: [Int], lastPlayerTurn: Int) -> Int {
-        let winner = gameWinner(currBoard: lastBoard, currPlayerTurn: lastPlayerTurn)
-        var nextPlayerTurn: Int
-        if lastPlayerTurn == 1 {
-            nextPlayerTurn = 2
-        }
-        else {
-            nextPlayerTurn = 1
-        }
-        if winner != Game.EMPTY_VAL {
-            if winner == Game.O_VAL { return 10 }
-            else if winner == Game.X_VAL { return -10 }
-            return 0
-        }
-        var scores = [Int]()
-        var moves = [Int]()
-        for i in 0 ..< 9 {
-            if lastBoard[i] == Game.EMPTY_VAL {
-                var possibleBoard = lastBoard
-                possibleBoard[i] = nextPlayerTurn
-                scores.append(bestMove(lastBoard: possibleBoard, lastPlayerTurn: nextPlayerTurn))
-                moves.append(i)
-            }
-        }
-        if nextPlayerTurn == playerTurn {
-            if board == lastBoard {
-                return moves[scores.index(of: scores.max()!)!]
-            }
-            return scores.max()!
-        }
-        else {
-            if board == lastBoard {
-                return moves[scores.index(of: scores.min()!)!]
-            }
-            return scores.min()!
-        }
-    }
-    
-    
-    
-    /*----------
      - Description: checks to see if anyone has won the game, or if the game has resulted in a tie
      - Input: the board to be tested for a winner, the last player to have made a move on the board
      - Return: 1 (X wins), 2 (O wins), 3 (tie), or 0 (game not over)
      ----------*/
-    func gameWinner(currBoard: [Int], currPlayerTurn: Int) -> Int {
-        if (checkForRow(square1: 0, square2: 1, square3: 2, currBoard: currBoard)
-            || checkForRow(square1: 3, square2: 4, square3: 5, currBoard: currBoard)
-            || checkForRow(square1: 6, square2: 7, square3: 8, currBoard: currBoard)
-            || checkForRow(square1: 0, square2: 3, square3: 6, currBoard: currBoard)
-            || checkForRow(square1: 1, square2: 4, square3: 7, currBoard: currBoard)
-            || checkForRow(square1: 2, square2: 5, square3: 8, currBoard: currBoard)
-            || checkForRow(square1: 0, square2: 4, square3: 8, currBoard: currBoard)
-            || checkForRow(square1: 2, square2: 4, square3: 6, currBoard: currBoard)) {
-            if (currBoard == board) {
-                notifyGameWinner(winner: currPlayerTurn)
-            }
-            return currPlayerTurn;
+    func gameWinner() -> Int {
+        if (checkForRow(square1: 0, square2: 1, square3: 2)
+            || checkForRow(square1: 3, square2: 4, square3: 5)
+            || checkForRow(square1: 6, square2: 7, square3: 8)
+            || checkForRow(square1: 0, square2: 3, square3: 6)
+            || checkForRow(square1: 1, square2: 4, square3: 7)
+            || checkForRow(square1: 2, square2: 5, square3: 8)
+            || checkForRow(square1: 0, square2: 4, square3: 8)
+            || checkForRow(square1: 2, square2: 4, square3: 6)) {
+            notifyGameWinner(winner: playerTurn)
+            return playerTurn;
         }
         for i in 0 ..< 9 {
-            if (currBoard[i] == Game.EMPTY_VAL) {
+            if (board[i] == Game.EMPTY_VAL) {
                 return Game.EMPTY_VAL;
             }
         }
-        if (currBoard == board) {
-            notifyGameWinner(winner: Game.TIE_VAL)
-        }
+        notifyGameWinner(winner: Game.TIE_VAL)
         return Game.TIE_VAL;
     }
     
@@ -189,10 +116,10 @@ class Game {
      - Input: the three squares in question, the board to be tested for a row
      - Return: complete or not complete
      ----------*/
-    func checkForRow(square1: Int, square2: Int, square3: Int, currBoard: [Int]) -> Bool {
-        if (currBoard[square1] == currBoard[square2]
-            && currBoard[square1] == currBoard[square3]
-            && currBoard[square1] != Game.EMPTY_VAL) {
+    func checkForRow(square1: Int, square2: Int, square3: Int) -> Bool {
+        if (board[square1] == board[square2]
+            && board[square1] == board[square3]
+            && board[square1] != Game.EMPTY_VAL) {
             return true;
         }
         return false;
@@ -231,17 +158,16 @@ class Game {
     func getActive() -> Bool { return active }
     func toggleActive() { active = !active }
     func getSquare(choice: Int) -> Int { return board[choice] }
-    func getBoard() -> [Int] { return board }
     
     /*----------
      - Description: prints the current state of the board (for debugging only)
      - Input: none
      - Return: none
      ----------*/
-    func printBoard(tempBoard: [Int]) {
+    func printBoard() {
         for i in 0 ..< 3 {
             for j in 0 ..< 3 {
-                print("\(tempBoard[i * 3 + j]) \t")
+                print("\(board[i * 3 + j]) \t")
             }
             print("\n");
         }

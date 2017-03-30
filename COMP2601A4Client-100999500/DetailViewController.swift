@@ -394,7 +394,7 @@ class DetailViewController: UIViewController {
         }
         else {
             stream.close()
-            navigationController?.navigationController?.popViewController(animated: true)
+            _ = navigationController?.navigationController?.popViewController(animated: true)
             MasterViewController.instance?.playGameRequestDeclined(opponentName: source)
         }
     }
