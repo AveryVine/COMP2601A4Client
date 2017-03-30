@@ -26,4 +26,5 @@ class Strings {
     let square6 = "Button 6 pressed."
     let square7 = "Button 7 pressed."
     let square8 = "Button 8 pressed."
+    let waitingForOpponent = "Waiting for response from opponent..."
 }

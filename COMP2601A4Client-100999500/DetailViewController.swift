@@ -22,7 +22,6 @@ class DetailViewController: UIViewController {
     @IBOutlet var tile8: UIButton?
     @IBOutlet var label: UILabel?
     @IBOutlet var button: UIButton?
-    @IBOutlet var switchAI: UISwitch?
     
     static var instance: DetailViewController?
     var opponentName: String!
@@ -48,6 +47,13 @@ class DetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
+        navigationItem.leftItemsSupplementBackButton = false
+        navigationItem.hidesBackButton = true
+        let newBackButton = UIBarButtonItem(title: "Close Game", style: UIBarButtonItemStyle.plain, target: self, action: #selector(DetailViewController.back(sender:)))
+        navigationItem.setLeftBarButton(newBackButton, animated: true)
+        
         // Do any additional setup after loading the view, typically from a nib.
         DetailViewController.instance = self
         configureView()
@@ -69,9 +75,16 @@ class DetailViewController: UIViewController {
         }
     }
     
-    func openConnection(acceptor: AcceptorReactor, hostName: String, port: UInt16) {
+    func setAcceptor(acceptor: AcceptorReactor) {
         self.acceptor = acceptor
-        acceptor.open(host: hostName, port: port)
+    }
+    
+    func openConnection(host: String, port: UInt16) {
+        acceptor?.open(host: host, port: port)
+        DispatchQueue.main.async {
+            self.label?.text = self.strings.waitingForOpponent
+            self.button?.isEnabled = false
+        }
     }
     
     
@@ -135,7 +148,7 @@ class DetailViewController: UIViewController {
                 self.timer?.cancel()
                 self.timer = nil
             }
-            let choice = self.game.randomSquare(switchAI: (self.switchAI?.isOn)!)
+            let choice = self.game.randomSquare(switchAI: true)
             DispatchQueue.main.sync {
                 self.game.makeMove(choice: choice)
             }
@@ -255,7 +268,6 @@ class DetailViewController: UIViewController {
         wipeSquares()
         button?.setTitle(strings.startButton_gameActive, for: UIControlState.normal)
         label?.text = strings.blank
-        switchAI?.isEnabled = false
     }
     
     
@@ -298,7 +310,6 @@ class DetailViewController: UIViewController {
             label?.text = strings.no_winner
         }
         button?.setTitle(strings.startButton_gameInactive, for: UIControlState.normal)
-        switchAI?.isEnabled = true
     }
     
     
@@ -343,15 +354,32 @@ class DetailViewController: UIViewController {
         toggleClickListeners()
     }
     
-    func playGameResponse(response: Bool, opponentName: String) {
+    func playGameResponseHandler(response: Bool, opponentName: String, stream: EventStream) {
         print("Response: \(response)")
         if response {
-            
+            DispatchQueue.main.async {
+                self.label?.text = self.strings.displayTextView_gameInactive
+                self.button?.isEnabled = true
+            }
         }
         else {
-            self.navigationController?.navigationController?.popViewController(animated: true)
+            stream.close()
+            self.performSegue(withIdentifier: "unwindShowDetail", sender: nil)
+            //self.navigationController?.navigationController?.popViewController(animated: true)
             MasterViewController.instance?.playGameRequestDeclined(opponentName: opponentName)
         }
+    }
+    
+    func back(sender: UIBarButtonItem) {
+        print("Back button pressed...")
+        acceptor?.disconnect()
+        navigationController?.navigationController?.popViewController(animated: true)
+    }
+    
+    
+    
+    func gameOverHandler(reason: String) {
+        //TODO - deal with response here
     }
 }
 

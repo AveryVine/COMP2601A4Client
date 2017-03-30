@@ -74,6 +74,18 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         }
     }
     
+    func disconnect() {
+        if (MasterViewController.instance?.inGame)! {
+            print("In Game")
+            let source = (MasterViewController.instance?.deviceName)!
+            let destination = (MasterViewController.instance?.opponentName)!
+            Event(stream: (clients.popFirst()?.value)!, fields: ["TYPE": "GAME_OVER", "SOURCE": source, "DESTINATION": destination, "REASON": (source + " ended the game.")]).put()
+        }
+        else {
+            print("Not In Game")
+        }
+    }
+    
     //Client setup
     func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
         print("netServiceBrowser - didFind - \(service.name)")
@@ -135,7 +147,7 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
     }
     
     func socketDidDisconnect(_ sock: Socket, withError err: Error?) {
-        print("Client disconnected: \(String(describing: err))")
+        print("Client disconnected with error: \(String(describing: err))")
         clients.removeValue(forKey: sock)
         sock.disconnect()
     }

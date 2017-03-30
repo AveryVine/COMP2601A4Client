@@ -12,7 +12,7 @@ class PlayGameRequestHandler: EventHandler {
     func handleEvent(event: Event) {
         print("PlayGameRequestHandler")
         let opponentName = event.fields["SOURCE"] as! String
-        MasterViewController.instance?.playGameRequest(opponentName: opponentName, stream: event.stream)
+        MasterViewController.instance?.playGameRequestHandler(opponentName: opponentName, stream: event.stream)
     }
 }
 
@@ -20,7 +20,7 @@ class PlayGameResponseHandler: EventHandler {
     func handleEvent(event: Event) {
         print("PlayGameResponseHandler")
         let response = event.fields["ANSWER"] as! Bool
-        DetailViewController.instance?.playGameResponse(response: response, opponentName: event.fields["SOURCE"] as! String)
+        DetailViewController.instance?.playGameResponseHandler(response: response, opponentName: event.fields["SOURCE"] as! String, stream: event.stream)
     }
 }
 
@@ -39,5 +39,6 @@ class MoveMessageHandler: EventHandler {
 class GameOverHandler: EventHandler {
     func handleEvent(event: Event) {
         print("GameOverHandler")
+        DetailViewController.instance?.gameOverHandler(reason: event.fields["REASON"] as! String)
     }
 }
