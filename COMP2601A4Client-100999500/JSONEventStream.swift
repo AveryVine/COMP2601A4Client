@@ -18,11 +18,7 @@ class JSONEventStream: EventStream {
     }
     
     func get(data: Data) -> Event {
-        let string = String(data: data, encoding: .ascii)
-        let json = try? JSONSerialization.jsonObject(with: data, options: []) as! [String : String]
-        // So you can see what is being received by the
-        // stream.
-        print("Data: \(String(describing: string))")
+        let json = try? JSONSerialization.jsonObject(with: data, options: []) as! [String : Any]
         
         let event = Event(stream: self, fields: json!)
         return event

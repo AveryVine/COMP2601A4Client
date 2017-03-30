@@ -11,13 +11,16 @@ import Foundation
 class PlayGameRequestHandler: EventHandler {
     func handleEvent(event: Event) {
         print("PlayGameRequestHandler")
-        MasterViewController.instance?.playGameRequest(event: event)
+        let opponentName = event.fields["SOURCE"] as! String
+        MasterViewController.instance?.playGameRequest(opponentName: opponentName, stream: event.stream)
     }
 }
 
 class PlayGameResponseHandler: EventHandler {
     func handleEvent(event: Event) {
         print("PlayGameResponseHandler")
+        let response = event.fields["ANSWER"] as! Bool
+        DetailViewController.instance?.playGameResponse(response: response, opponentName: event.fields["SOURCE"] as! String)
     }
 }
 

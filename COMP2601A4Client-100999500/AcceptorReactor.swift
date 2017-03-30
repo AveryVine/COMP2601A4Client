@@ -119,11 +119,11 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
     //GCDAsyncSocketDelegate callbacks
     func socket(_ socket: Socket, didAcceptNewSocket newSocket: Socket) {
         print("Socket Created")
-        let es = JSONEventStream(socket: socket)
+        let es = JSONEventStream(socket: newSocket)
         clients[newSocket] = es
-        MasterViewController.instance?.performSegue(withIdentifier: "showDetail", sender: self)
+        es.get()
     }
-    
+
     func socket(_ socket : GCDAsyncSocket, didConnectToHost host:String, port p:UInt16) {
         print("Socket Created")
         let es = JSONEventStream(socket: socket)
@@ -131,6 +131,7 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         let destination = MasterViewController.instance?.opponentName
         clients[socket] = es
         Event(stream: es, fields: ["TYPE": "PLAY_GAME_REQUEST", "SOURCE": source!, "DESTINATION": destination!]).put()
+        es.get()
     }
     
     func socketDidDisconnect(_ sock: Socket, withError err: Error?) {
@@ -140,6 +141,7 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
     }
 
     func socket(_ sock: Socket, didRead data: Data, withTag tag: Int) {
+        print("Received data")
         let es = clients[sock]
         dispatch(event: (es?.get(data: data))!)
         es?.get()

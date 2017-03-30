@@ -343,29 +343,15 @@ class DetailViewController: UIViewController {
         toggleClickListeners()
     }
     
-    func playGameRequest(event: Event) {
-        opponentName = event.fields["SOURCE"]! as! String
-        let refreshAlert = UIAlertController(title: "Tic Tac Toe", message: "\(opponentName) has challenged you to a game.", preferredStyle: UIAlertControllerStyle.alert)
-        
-        refreshAlert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { (action: UIAlertAction!) in
-            print("Sending Accept")
-            Event(stream: event.stream,
-                  fields: ["TYPE": "PLAY_GAME_RESPONSE",
-                           "SOURCE": (MasterViewController.instance?.deviceName)!,
-                           "DESTINATION": self.opponentName,
-                           "ANSWER": true]).put()
-        }))
-        
-        refreshAlert.addAction(UIAlertAction(title: "Decline", style: .cancel, handler: { (action: UIAlertAction!) in
-            print("Sending Decline")
-            Event(stream: event.stream,
-                  fields: ["TYPE": "PLAY_GAME_RESPONSE",
-                           "SOURCE": (MasterViewController.instance?.deviceName)!,
-                           "DESTINATION": self.opponentName,
-                           "ANSWER": false]).put()
-        }))
-        
-        present(refreshAlert, animated: true, completion: nil)
+    func playGameResponse(response: Bool, opponentName: String) {
+        print("Response: \(response)")
+        if response {
+            
+        }
+        else {
+            self.navigationController?.navigationController?.popViewController(animated: true)
+            MasterViewController.instance?.playGameRequestDeclined(opponentName: opponentName)
+        }
     }
 }
 

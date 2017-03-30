@@ -137,23 +137,23 @@ class MasterViewController: UITableViewController {
         }
     }
 
-    func playGameRequest(event: Event) {
-        opponentName = event.fields["SOURCE"]! as! String
+    func playGameRequest(opponentName: String, stream: EventStream) {
+        self.opponentName = opponentName
         let refreshAlert = UIAlertController(title: "Tic Tac Toe", message: "\(opponentName) has challenged you to a game.", preferredStyle: UIAlertControllerStyle.alert)
         
         refreshAlert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { (action: UIAlertAction!) in
             print("Sending Accept")
-            Event(stream: event.stream,
+            Event(stream: stream,
                   fields: ["TYPE": "PLAY_GAME_RESPONSE",
                            "SOURCE": self.deviceName,
                            "DESTINATION": self.opponentName,
                            "ANSWER": true]).put()
-            //performSegue(withIdentifier: "recipientSegue", sender: self)
+            self.performSegue(withIdentifier: "showDetail", sender: self)
         }))
         
         refreshAlert.addAction(UIAlertAction(title: "Decline", style: .cancel, handler: { (action: UIAlertAction!) in
             print("Sending Decline")
-            Event(stream: event.stream,
+            Event(stream: stream,
                   fields: ["TYPE": "PLAY_GAME_RESPONSE",
                            "SOURCE": self.deviceName,
                            "DESTINATION": self.opponentName,
@@ -162,6 +162,11 @@ class MasterViewController: UITableViewController {
         
         present(refreshAlert, animated: true, completion: nil)
     }
-
+    
+    func playGameRequestDeclined(opponentName: String) {
+        let refreshAlert = UIAlertController(title: "Tic Tac Toe", message: "\(opponentName) is unavailable to play.", preferredStyle: UIAlertControllerStyle.alert)
+        refreshAlert.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
+        present(refreshAlert, animated: true, completion: nil)
+    }
 }
 
