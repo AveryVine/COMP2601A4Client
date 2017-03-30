@@ -74,12 +74,13 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         }
     }
     
-    func disconnect() {
-        if (MasterViewController.instance?.inGame)! {
+    func disconnect(stream: EventStream) {
+        if MasterViewController.instance?.inGame != MasterViewController.instance?.NOT_IN_GAME {
             print("In Game")
             let source = (MasterViewController.instance?.deviceName)!
             let destination = (MasterViewController.instance?.opponentName)!
-            Event(stream: (clients.popFirst()?.value)!, fields: ["TYPE": "GAME_OVER", "SOURCE": source, "DESTINATION": destination, "REASON": (source + " ended the game.")]).put()
+            Event(stream: stream, fields: ["TYPE": "GAME_OVER", "SOURCE": source, "DESTINATION": destination, "REASON": (source + " ended the game.")]).put()
+            stream.close()
         }
         else {
             print("Not In Game")
@@ -113,6 +114,7 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         if let index = services.index(of: service) {
             services.remove(at: index)
         }
+        MasterViewController.instance?.updateServices(services: services)
     }
     
     //Reactor protocol
@@ -150,6 +152,9 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
         print("Client disconnected with error: \(String(describing: err))")
         clients.removeValue(forKey: sock)
         sock.disconnect()
+        if MasterViewController.instance?.inGame == MasterViewController.instance?.IN_GAME {
+            DetailViewController.instance?.opponentDisconnected()
+        }
     }
 
     func socket(_ sock: Socket, didRead data: Data, withTag tag: Int) {

@@ -141,11 +141,9 @@
                         <outlet property="tile6" destination="qGP-Ne-7lY" id="ZA9-rQ-e1m"/>
                         <outlet property="tile7" destination="XyU-Mq-e7z" id="W9x-Tr-IC8"/>
                         <outlet property="tile8" destination="RaO-2G-rvD" id="yE3-pI-kna"/>
-                        <segue destination="XJs-Xp-3gD" kind="unwind" identifier="unwindShowDetail" unwindAction="dismissDetailViewWithSegue:" id="QXY-VD-hWi"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FJe-Yq-33r" sceneMemberID="firstResponder"/>
-                <exit id="XJs-Xp-3gD" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="709" y="129"/>
         </scene>

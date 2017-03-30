@@ -24,7 +24,7 @@ class DetailViewController: UIViewController {
     @IBOutlet var button: UIButton?
     
     static var instance: DetailViewController?
-    var opponentName: String!
+    var stream: EventStream?
     var acceptor: AcceptorReactor?
     var gameThread: DispatchQueue?
     var timer: DispatchSourceTimer?
@@ -79,7 +79,12 @@ class DetailViewController: UIViewController {
         self.acceptor = acceptor
     }
     
+    func setStream(stream: EventStream) {
+        self.stream = stream
+    }
+    
     func openConnection(host: String, port: UInt16) {
+        MasterViewController.instance?.inGame = MasterViewController.instance?.BETWEEN_GAMES
         acceptor?.open(host: host, port: port)
         DispatchQueue.main.async {
             self.label?.text = self.strings.waitingForOpponent
@@ -354,9 +359,26 @@ class DetailViewController: UIViewController {
         toggleClickListeners()
     }
     
-    func playGameResponseHandler(response: Bool, opponentName: String, stream: EventStream) {
+    func back(sender: UIBarButtonItem) {
+        acceptor?.disconnect(stream: stream!)
+        stream = nil
+        navigationController?.navigationController?.popViewController(animated: true)
+    }
+    
+    func opponentDisconnected() {
+        let opponentName = (MasterViewController.instance?.opponentName)!
+        let alert = UIAlertController(title: "Tic Tac Toe", message: "\(opponentName) has disconnected.", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
+        navigationController?.present(alert, animated: true, completion: nil)
+        self.button?.isEnabled = false
+        MasterViewController.instance?.inGame = MasterViewController.instance?.BETWEEN_GAMES
+    }
+    
+    func playGameResponseHandler(source: String, response: Bool, stream: EventStream) {
         print("Response: \(response)")
         if response {
+            self.stream = stream
+            MasterViewController.instance?.inGame = MasterViewController.instance?.IN_GAME
             DispatchQueue.main.async {
                 self.label?.text = self.strings.displayTextView_gameInactive
                 self.button?.isEnabled = true
@@ -364,21 +386,40 @@ class DetailViewController: UIViewController {
         }
         else {
             stream.close()
-            self.performSegue(withIdentifier: "unwindShowDetail", sender: nil)
-            //self.navigationController?.navigationController?.popViewController(animated: true)
-            MasterViewController.instance?.playGameRequestDeclined(opponentName: opponentName)
+            navigationController?.navigationController?.popViewController(animated: true)
+            MasterViewController.instance?.playGameRequestDeclined(opponentName: source)
         }
     }
     
-    func back(sender: UIBarButtonItem) {
-        print("Back button pressed...")
-        acceptor?.disconnect()
-        navigationController?.navigationController?.popViewController(animated: true)
+    func gameOnHandler(source: String) {
+        prepareUI()
+        DispatchQueue.main.async {
+            self.label?.text = source + " has started a game."
+        }
+        game = Game()
     }
     
+    func moveMessageHandler(choice: Int, source: String, destination: String) {
+        DispatchQueue.main.sync {
+            self.game.makeMove(choice: choice)
+        }
+//        let gameWinner = game.gameWinner()
+//        if gameWinner == Game.EMPTY_VAL {
+            game.switchPlayer()
+            DispatchQueue.main.async {
+                self.toggleClickListeners()
+//            }
+        }
+//        else {
+            self.game.toggleActive()
+            DispatchQueue.main.async {
+//                gameOverUI(winner: gameWinner)
+            }
+            Event(stream: stream!, fields: ["TYPE": "GAME_OVER", "SOURCE": destination, "DESTINATION": source, "REASON": source + " won the game."]).put()
+//        }
+    }
     
-    
-    func gameOverHandler(reason: String) {
+    func gameOverHandler(reason: String, stream: EventStream) {
         //TODO - deal with response here
     }
 }

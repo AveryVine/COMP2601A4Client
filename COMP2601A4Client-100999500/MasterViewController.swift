@@ -9,39 +9,45 @@
 import UIKit
 
 class MasterViewController: UITableViewController {
+    let IN_GAME = 2
+    let BETWEEN_GAMES = 1
+    let NOT_IN_GAME = 0
     
     static var instance: MasterViewController?
     var randomGenID = ""
-    var inGame: Bool!
+    var inGame: Int!
     var deviceName: String!
     var opponentName: String!
     var acceptor: AcceptorReactor?
 
     var detailViewController: DetailViewController? = nil
     var services = [NetService]()
+    
+//    ----------------------------------------
+//    IF YOU HAVE TIME, FIX THIS BUG
+//    Player1: Tap Player2's name
+//    Player2: Accept the request from Player1
+//    Player2: Tap Close Game button
+//    Player1: No disconnect alert pops up here
+//    ----------------------------------------
 
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        //navigationItem.leftBarButtonItem = editButtonItem
-
-        //let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
-        //navigationItem.rightBarButtonItem = addButton
         if let split = splitViewController {
             let controllers = split.viewControllers
             detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
         }
         
         MasterViewController.instance = self
-        inGame = false
         
         for _ in 0 ..< 8 {
             randomGenID += String(arc4random_uniform(10))
         }
         deviceName = UIDevice.current.name + " (" + randomGenID + ")"
         
-        acceptor = AcceptorReactor(domain: "local.", type: "_tictactoe._tcp.", name: deviceName + "0", port: 8889)
+        acceptor = AcceptorReactor(domain: "local.", type: "_tictactoe._tcp.", name: deviceName, port: 8889)
         acceptor?.register(name: "PLAY_GAME_REQUEST", handler: PlayGameRequestHandler())
         acceptor?.register(name: "PLAY_GAME_RESPONSE", handler: PlayGameResponseHandler())
         acceptor?.register(name: "GAME_ON", handler: GameOnHandler())
@@ -59,12 +65,13 @@ class MasterViewController: UITableViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        inGame = false
+        inGame = NOT_IN_GAME
+        print("Updated inGame Status to \(inGame)")
+        opponentName = nil
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     func updateServices(services: [NetService]) {
@@ -73,30 +80,14 @@ class MasterViewController: UITableViewController {
     }
 
     // MARK: - Segues
-    
-    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
-        if identifier == "showDetail" {
-            if let indexPath = tableView.indexPathForSelectedRow {
-                let service = services[indexPath.row]
-                let opponent = service.name.substring(to: service.name.index(service.name.endIndex, offsetBy: -1))
-                if service.name.substring(from: service.name.index(service.name.endIndex, offsetBy: -1)) != "0" {
-                    tableView.cellForRow(at: indexPath)?.isSelected = false
-                    playGameRequestDeclined(opponentName: opponent)
-                    return false
-                }
-            }
-        }
-        return true
-    }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        inGame = true
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
                 let service = services[indexPath.row]
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = service
-                opponentName = service.name.substring(to: service.name.index(service.name.endIndex, offsetBy: -1))
+                opponentName = service.name
                 controller.setAcceptor(acceptor: acceptor!)
                 controller.openConnection(host: service.hostName!, port: UInt16(service.port))
             }
@@ -117,7 +108,7 @@ class MasterViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
 
         let service = services[indexPath.row]
-        cell.textLabel!.text = service.name.substring(to: service.name.index(service.name.endIndex, offsetBy: -1))
+        cell.textLabel!.text = service.name
         return cell
     }
 
@@ -135,54 +126,52 @@ class MasterViewController: UITableViewController {
         }
     }
 
-    func playGameRequestHandler(opponentName: String, stream: EventStream) {
-        self.opponentName = opponentName
-        if inGame {
-            declineGame(opponentName: self.opponentName, stream: stream)
+    func playGameRequestHandler(source: String, destination: String, stream: EventStream) {
+        self.opponentName = source
+        if inGame != NOT_IN_GAME {
+            declineGame(source: destination, destination: source, stream: stream)
         }
         else {
-            let refreshAlert = UIAlertController(title: "Tic Tac Toe", message: "\(opponentName) has challenged you to a game.", preferredStyle: UIAlertControllerStyle.alert)
+            let alert = UIAlertController(title: "Tic Tac Toe", message: "\(opponentName!) has challenged you to a game.", preferredStyle: UIAlertControllerStyle.alert)
             
-            refreshAlert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { (action: UIAlertAction!) in
-                self.acceptGame(opponentName: self.opponentName, stream: stream)
+            alert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { (action: UIAlertAction!) in
+                self.acceptGame(source: destination, destination: source, stream: stream)
             }))
             
-            refreshAlert.addAction(UIAlertAction(title: "Decline", style: .cancel, handler: { (action: UIAlertAction!) in
-                self.declineGame(opponentName: self.opponentName, stream: stream)
+            alert.addAction(UIAlertAction(title: "Decline", style: .cancel, handler: { (action: UIAlertAction!) in
+                self.declineGame(source: destination, destination: source, stream: stream)
             }))
             
-            present(refreshAlert, animated: true, completion: nil)
+            present(alert, animated: true, completion: nil)
         }
     }
     
-    func acceptGame(opponentName: String, stream: EventStream) {
-        print("Sending Accept")
+    func acceptGame(source: String, destination: String, stream: EventStream) {
         Event(stream: stream,
               fields: ["TYPE": "PLAY_GAME_RESPONSE",
-                       "SOURCE": self.deviceName,
-                       "DESTINATION": self.opponentName,
+                       "SOURCE": source,
+                       "DESTINATION": destination,
                        "ANSWER": true]).put()
         DetailViewController.instance?.setAcceptor(acceptor: acceptor!)
+        DetailViewController.instance?.setStream(stream: stream)
+        inGame = IN_GAME
+        print("Updated inGame Status to \(inGame)")
         performSegue(withIdentifier: "showDetail", sender: self)
     }
     
-    func declineGame(opponentName: String, stream: EventStream) {
+    func declineGame(source: String, destination: String, stream: EventStream) {
         print("Sending Decline")
         Event(stream: stream,
               fields: ["TYPE": "PLAY_GAME_RESPONSE",
-                       "SOURCE": self.deviceName,
-                       "DESTINATION": self.opponentName,
+                       "SOURCE": source,
+                       "DESTINATION": destination,
                        "ANSWER": false]).put()
     }
     
     func playGameRequestDeclined(opponentName: String) {
-        let refreshAlert = UIAlertController(title: "Tic Tac Toe", message: "\(opponentName) is unavailable to play.", preferredStyle: UIAlertControllerStyle.alert)
-        refreshAlert.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
-        present(refreshAlert, animated: true, completion: nil)
-    }
-    
-    @IBAction func dismissDetailView(segue: UIStoryboardSegue) {
-        print("Testing 123")
+        let alert = UIAlertController(title: "Tic Tac Toe", message: "\(opponentName) is unavailable to play.", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
 }
 
