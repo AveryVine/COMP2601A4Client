@@ -19,6 +19,7 @@ class MasterViewController: UITableViewController {
     var deviceName: String!
     var opponentName: String!
     var acceptor: AcceptorReactor?
+    var stream: EventStream?
 
     var detailViewController: DetailViewController? = nil
     var services = [NetService]()
@@ -88,8 +89,6 @@ class MasterViewController: UITableViewController {
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
                 controller.detailItem = service
                 opponentName = service.name
-                controller.setAcceptor(acceptor: acceptor!)
-                controller.openConnection(host: service.hostName!, port: UInt16(service.port))
             }
         }
     }
@@ -152,10 +151,10 @@ class MasterViewController: UITableViewController {
                        "SOURCE": source,
                        "DESTINATION": destination,
                        "ANSWER": true]).put()
-        DetailViewController.instance?.setAcceptor(acceptor: acceptor!)
-        DetailViewController.instance?.setStream(stream: stream)
+        print("Accepted game")
         inGame = IN_GAME
         print("Updated inGame Status to \(inGame)")
+        self.stream = stream
         performSegue(withIdentifier: "showDetail", sender: self)
     }
     

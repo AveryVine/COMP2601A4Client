@@ -58,6 +58,14 @@ class DetailViewController: UIViewController {
         DetailViewController.instance = self
         configureView()
         
+        acceptor = MasterViewController.instance?.acceptor
+        if detailItem != nil {
+            openConnection(host: (detailItem?.hostName)!, port: UInt16((detailItem?.port)!))
+        }
+        else {
+            stream = MasterViewController.instance?.stream
+        }
+        
         initUI()
         game.toggleActive()
         toggleClickListeners()
@@ -77,10 +85,7 @@ class DetailViewController: UIViewController {
     
     func setAcceptor(acceptor: AcceptorReactor) {
         self.acceptor = acceptor
-    }
-    
-    func setStream(stream: EventStream) {
-        self.stream = stream
+        print("Acceptor set")
     }
     
     func openConnection(host: String, port: UInt16) {
@@ -360,8 +365,11 @@ class DetailViewController: UIViewController {
     }
     
     func back(sender: UIBarButtonItem) {
-        acceptor?.disconnect(stream: stream!)
-        stream = nil
+        print("Back button pressed")
+        if stream != nil {
+            acceptor?.disconnect(stream: stream!)
+            stream = nil
+        }
         navigationController?.navigationController?.popViewController(animated: true)
     }
     

@@ -75,6 +75,7 @@ class AcceptorReactor: NSObject, SocketDelegate, NetServiceDelegate, NetServiceB
     }
     
     func disconnect(stream: EventStream) {
+        print("Disconnect")
         if MasterViewController.instance?.inGame != MasterViewController.instance?.NOT_IN_GAME {
             print("In Game")
             let source = (MasterViewController.instance?.deviceName)!
