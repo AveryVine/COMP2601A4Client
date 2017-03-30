@@ -8,7 +8,7 @@
 
 import UIKit
 
-class DetailViewController: UIViewController {
+class DetailViewController: UIViewController, Observer {
 
     @IBOutlet weak var detailDescriptionLabel: UILabel!
     @IBOutlet var tile0: UIButton?
@@ -136,13 +136,13 @@ class DetailViewController: UIViewController {
         }
         else {
             game = Game()
-            self.game.attachObserver(observer: self as! Observer)
+            self.game.attachObserver(observer: self as Observer)
             prepareUI()
             toggleClickListeners()
             gameLoop()
         }
     }
-    
+    /*
     
     
     /*----------
@@ -162,7 +162,7 @@ class DetailViewController: UIViewController {
             DispatchQueue.main.sync {
                 self.game.makeMove(choice: choice)
             }
-            let gameWinner = self.game.gameWinner(currBoard: self.game.getBoard(), currPlayerTurn: self.game.getPlayerTurn())
+            let gameWinner = self.game.gameWinner()//(currBoard: self.game.getBoard(), currPlayerTurn: self.game.getPlayerTurn())
             if gameWinner == Game.EMPTY_VAL {
                 self.game.switchPlayer()
                 DispatchQueue.main.async {
@@ -186,7 +186,7 @@ class DetailViewController: UIViewController {
         timer?.setEventHandler(handler: computerMoveTask)
         timer?.resume()
     }
-    
+    */
     
     
     /*----------
@@ -353,7 +353,7 @@ class DetailViewController: UIViewController {
         timer = nil
         let choice = sender.tag
         game.makeMove(choice: choice)
-        let gameWinner = game.gameWinner(currBoard: game.getBoard(), currPlayerTurn: game.getPlayerTurn())
+        let gameWinner = game.gameWinner()//(currBoard: game.getBoard(), currPlayerTurn: game.getPlayerTurn())
         if gameWinner == Game.EMPTY_VAL {
             game.switchPlayer()
             gameLoop()
@@ -370,7 +370,7 @@ class DetailViewController: UIViewController {
             acceptor?.disconnect(stream: stream!)
             stream = nil
         }
-        navigationController?.navigationController?.popViewController(animated: true)
+        _ = navigationController?.navigationController?.popViewController(animated: true)
     }
     
     func opponentDisconnected() {
@@ -409,26 +409,36 @@ class DetailViewController: UIViewController {
     
     func moveMessageHandler(choice: Int, source: String, destination: String) {
         DispatchQueue.main.sync {
-            self.game.makeMove(choice: choice)
+            self.game.makeMove(choice: choice)  //Observer updates UI for you
         }
-//        let gameWinner = game.gameWinner()
-//        if gameWinner == Game.EMPTY_VAL {
+        
+        
+        let gameWinner = game.gameWinner()
+        if gameWinner == Game.EMPTY_VAL {
             game.switchPlayer()
             DispatchQueue.main.async {
                 self.toggleClickListeners()
-//            }
-        }
-//        else {
-            self.game.toggleActive()
-            DispatchQueue.main.async {
-//                gameOverUI(winner: gameWinner)
             }
+        }
+        else {
+            self.game.toggleActive()
+            //DispatchQueue.main.async {
+                //self.gameOverUI(winner: gameWinner)
+            //}
             Event(stream: stream!, fields: ["TYPE": "GAME_OVER", "SOURCE": destination, "DESTINATION": source, "REASON": source + " won the game."]).put()
-//        }
+        }
     }
     
-    func gameOverHandler(reason: String, stream: EventStream) {
+    func gameOverHandler(reason: String, destination: String, stream: EventStream) {
         //TODO - deal with response here
+        /*
+        game.toggleActive();
+        int winner = Integer.parseInt(message.body.getField(Fields.WINNER).toString());
+        String gameEnder = message.header.id;
+        gameOverUI(winner, gameEnder);
+ */
+        self.game.toggleActive()
+        _ = game.gameWinner()
     }
 }
 

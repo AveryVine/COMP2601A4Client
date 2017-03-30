@@ -47,6 +47,7 @@ class MoveMessageHandler: EventHandler {
 class GameOverHandler: EventHandler {
     func handleEvent(event: Event) {
         print("GameOverHandler")
-        DetailViewController.instance?.gameOverHandler(reason: event.fields["REASON"] as! String, stream: event.stream)
+        let destination = event.fields["DESTINATION"] as! String
+        DetailViewController.instance?.gameOverHandler(reason: event.fields["REASON"] as! String, destination: destination, stream: event.stream)
     }
 }
